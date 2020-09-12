@@ -58,8 +58,10 @@ RUN pip3 install --upgrade pip setuptools virtualenv==16.1.0
 RUN pip3 install cmake --upgrade
 
 # install gcc-8
-# RUN add-apt-repository ppa:ubuntu-toolchain-r/test
-# RUN apt-get update && apt install -y gcc-8 g++8
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test
+RUN apt-get update && apt install -y gcc-8 g++8
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 8
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 8
 
 RUN cmake --version
 RUN make --version
@@ -73,6 +75,7 @@ RUN virtualenv --version
 RUN wget https://github.com/bazelbuild/bazel/releases/download/0.25.2/bazel-0.25.2-installer-linux-x86_64.sh
 RUN chmod +x ./bazel-0.25.2-installer-linux-x86_64.sh
 RUN bash ./bazel-0.25.2-installer-linux-x86_64.sh
+
 WORKDIR /home
 
 RUN adduser --disabled-password --gecos '' dockuser
