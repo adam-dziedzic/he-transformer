@@ -35,7 +35,12 @@ RUN apt-get update && apt-get install -y \
         wget patch diffutils libtinfo-dev \
         autoconf libtool \
         doxygen graphviz \
-        yapf3 python3-yapf
+        yapf3 python3-yapf \
+        sudo \
+        libmpfr-dev \
+        libgmp-dev \
+        libssl-dev \
+        vim 
 
 # Install clang-9
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
@@ -51,6 +56,10 @@ RUN pip3 install --upgrade pip setuptools virtualenv==16.1.0
 # SEAL requires newer version of CMake
 RUN pip3 install cmake --upgrade
 
+# install gcc-8
+RUN apt-add-repository "ppa:ubuntu-toolchain-r/test"
+RUN apt-get update && apt install -y gcc-8 g++8
+
 RUN cmake --version
 RUN make --version
 RUN gcc --version
@@ -64,3 +73,8 @@ RUN wget https://github.com/bazelbuild/bazel/releases/download/0.25.2/bazel-0.25
 RUN chmod +x ./bazel-0.25.2-installer-linux-x86_64.sh
 RUN bash ./bazel-0.25.2-installer-linux-x86_64.sh
 WORKDIR /home
+
+RUN adduser --disabled-password --gecos '' dockuser
+RUN adduser dockuser sudo
+RUN echo 'dockuser ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER docker
