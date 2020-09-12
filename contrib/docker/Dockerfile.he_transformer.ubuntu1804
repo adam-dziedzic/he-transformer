@@ -41,7 +41,8 @@ RUN apt-get update && apt-get install -y \
         libmpfr-dev \
         libgmp-dev \
         libssl-dev \
-        vim 
+        vim \
+        gcc-8 g++8
 
 # Install clang-9
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
@@ -58,8 +59,8 @@ RUN pip3 install --upgrade pip setuptools virtualenv==16.1.0
 RUN pip3 install cmake --upgrade
 
 # install gcc-8
-RUN apt-add-repository "ppa:ubuntu-toolchain-r/test"
-RUN apt-get update && apt install -y gcc-8 g++8
+# RUN add-apt-repository ppa:ubuntu-toolchain-r/test
+# RUN apt-get update && apt install -y gcc-8 g++8
 
 RUN cmake --version
 RUN make --version
