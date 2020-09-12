@@ -23,6 +23,7 @@
 FROM ubuntu:18.04
 
 RUN apt-get update && apt-get install -y \
+        apt-utils \
         python3-pip virtualenv \
         python3-numpy python3-dev python3-wheel \
         git \
@@ -77,4 +78,4 @@ WORKDIR /home
 RUN adduser --disabled-password --gecos '' dockuser
 RUN adduser dockuser sudo
 RUN echo 'dockuser ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
-USER docker
+USER dockuser
