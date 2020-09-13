@@ -17,10 +17,13 @@
 # Environment to build and unit-test he-transformer
 # with g++ 8.0
 # with clang++ 9.0.1
-# with python 3.6.9
+# with python 3.6.8
 # with cmake 3.18.2
 
 FROM ubuntu:18.04
+
+# tz
+ARG DEBIAN_FRONTEND=noninteractive
 
 # install gcc-8
 # RUN add-apt-repository ppa:ubuntu-toolchain-r/test
