@@ -22,6 +22,9 @@
 
 FROM ubuntu:18.04
 
+# tzdata - do not run any interactive dialog
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y \
         apt-utils \
         python3-pip virtualenv \
@@ -45,8 +48,6 @@ RUN apt-get update && apt-get install -y \
 # RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 8
 # RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 8
 # update and install dependencies
-# tzdata - do not run any interactive dialog
-# ARG DEBIAN_FRONTEND=noninteractive
 RUN         apt-get update \
                 && apt-get install -y \
                     software-properties-common \
