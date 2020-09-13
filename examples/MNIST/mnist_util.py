@@ -146,7 +146,7 @@ def client_argument_parser():
     parser.add_argument(
         "--hostname", type=str, default="localhost", help="Hostname of server")
     parser.add_argument(
-        "--port", type=int, default=34000, help="Port of server")
+        "--port", type=int, default=34001, help="Port of server")
     parser.add_argument(
         "--encrypt_data_str",
         type=str,
