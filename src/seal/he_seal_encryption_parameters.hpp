@@ -35,10 +35,12 @@ class HESealEncryptionParameters {
   /// precision of the computation
   /// \param[in] complex_packing Whether or not to pack scalars (a,b,c,d) as (a
   /// +bi, c+di)
+  /// \param[in] port Port number at the server.
   HESealEncryptionParameters(std::string scheme_name,
                              seal::EncryptionParameters parms,
                              std::uint64_t security_level, double scale,
-                             bool complex_packing);
+                             bool complex_packing,
+                             std::size_t port);
 
   /// \brief Returns a set of default CKKS parameters using real packing
   /// \warning Default parameters do not enforce any security level
@@ -56,19 +58,21 @@ class HESealEncryptionParameters {
   /// \param[in] scheme_name Should be "HE_SEAL"
   /// \param[in] poly_modulus_degree Degree of the RLWE polynomial. Should be a
   /// power of 2
+  ///  \param[in] coeff_modulus_bits Vector of bit-widths of the cofficient
+  ///  moduli.
   /// \param[in] security_level Bits of security. 0 indicates no security
   /// \param[in] scale Scale at which to encode. Roughly corresponds to the
   /// precision of the computation
   /// \param[in] complex_packing Whether or not to pack scalars (a,b,c,d) as (a
   /// +bi, c+di)
-  ///  \param[in] coeff_modulus_bits Vector of bit-widths of the cofficient
-  ///  moduli.
+  /// \param[in] port Port number at the server.
   /// \throws ngraph_error if scheme_name is not "HE_SEAL"
   HESealEncryptionParameters(std::string scheme_name,
                              std::uint64_t poly_modulus_degree,
                              std::vector<int> coeff_modulus_bits,
                              std::uint64_t security_level, double scale,
-                             bool complex_packing);
+                             bool complex_packing,
+                             std::size_t port);
 
   /// \brief Returns encryption parameters at given path if possible, or use
   /// default parameters
@@ -141,6 +145,9 @@ class HESealEncryptionParameters {
   /// \brief Return whether or not complex packing is enabled
   bool& complex_packing() { return m_complex_packing; }
 
+  /// \brief Returns the port number
+  std::size_t port() const { return m_port; }
+
  private:
   std::string m_scheme_name;
   seal::EncryptionParameters m_seal_encryption_parameters{
@@ -148,6 +155,7 @@ class HESealEncryptionParameters {
   std::uint64_t m_security_level;
   double m_scale;
   bool m_complex_packing;
+  std::size_t m_port;
 };
 
 /// \brief Prints the given encryption parameters

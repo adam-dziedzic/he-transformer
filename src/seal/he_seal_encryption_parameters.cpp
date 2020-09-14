@@ -37,23 +37,26 @@ HESealEncryptionParameters::HESealEncryptionParameters() {
   m_security_level = default_parms.security_level();
   m_scale = default_parms.scale();
   m_complex_packing = default_parms.complex_packing();
+  m_port = default_parms.port();
 }
 
 HESealEncryptionParameters::HESealEncryptionParameters(
     std::string scheme_name, seal::EncryptionParameters parms,
-    std::uint64_t security_level, double scale, bool complex_packing)
+    std::uint64_t security_level, double scale, bool complex_packing, 
+    std::size_t port)
     : m_scheme_name(std::move(scheme_name)),
       m_seal_encryption_parameters(std::move(parms)),
       m_security_level(security_level),
       m_scale(scale),
-      m_complex_packing(complex_packing) {
+      m_complex_packing(complex_packing),
+      m_port(port) {
   validate_parameters();
 }
 
 HESealEncryptionParameters
 HESealEncryptionParameters::default_real_packing_parms() {
   return HESealEncryptionParameters(
-      "HE_SEAL", 1024, std::vector<int>{30, 30, 30, 30, 30}, 0, 1 << 30, false);
+      "HE_SEAL", 1024, std::vector<int>{30, 30, 30, 30, 30}, 0, 1 << 30, false, 34001);
 }
 
 HESealEncryptionParameters
@@ -66,11 +69,12 @@ HESealEncryptionParameters::default_complex_packing_parms() {
 HESealEncryptionParameters::HESealEncryptionParameters(
     std::string scheme_name, std::uint64_t poly_modulus_degree,
     std::vector<int> coeff_modulus_bits, std::uint64_t security_level,
-    double scale, bool complex_packing)
+    double scale, bool complex_packing, std::size_t port)
     : m_scheme_name(std::move(scheme_name)),
       m_security_level(security_level),
       m_scale(scale),
-      m_complex_packing(complex_packing) {
+      m_complex_packing(complex_packing),
+      m_port(port) {
   m_seal_encryption_parameters =
       seal::EncryptionParameters(seal::scheme_type::CKKS);
 
@@ -101,6 +105,9 @@ void HESealEncryptionParameters::validate_parameters() const {
 
   auto seal_sec_level = seal_security_level(security_level());
 
+  NGRAPH_CHECK(m_port >= 0 && m_port <= 65353, 
+               "port number must be in range [0,65535]");
+
   auto context = seal::SEALContext::Create(m_seal_encryption_parameters, true,
                                            seal_sec_level);
 
@@ -129,7 +136,8 @@ bool HESealEncryptionParameters::operator==(
          (other.m_seal_encryption_parameters == m_seal_encryption_parameters) &&
          (other.m_security_level == m_security_level) &&
          (other.m_scale == m_scale) &&
-         (other.m_complex_packing == m_complex_packing);
+         (other.m_complex_packing == m_complex_packing) &&
+         (other.m_port == m_port);
 #pragma clang diagnostic pop
 }
 
@@ -151,6 +159,7 @@ void HESealEncryptionParameters::save(std::ostream& stream) const {
                sizeof(m_complex_packing));
   stream.write(reinterpret_cast<const char*>(&m_security_level),
                sizeof(m_security_level));
+  stream.write(reinterpret_cast<const char*>(&m_port), sizeof(m_port));
 
   m_seal_encryption_parameters.save(stream);
 }
@@ -167,11 +176,15 @@ HESealEncryptionParameters HESealEncryptionParameters::load(
   uint64_t security_level;
   stream.read(reinterpret_cast<char*>(&security_level), sizeof(security_level));
 
+  std::size_t port;
+  stream.read(reinterpret_cast<char*>(&port), sizeof(port));
+
   seal::EncryptionParameters seal_encryption_parameters;
   seal_encryption_parameters.load(stream);
 
   return HESealEncryptionParameters("HE_SEAL", seal_encryption_parameters,
-                                    security_level, scale, complex_packing);
+                                    security_level, scale, complex_packing,
+                                    port);
 }
 
 HESealEncryptionParameters
@@ -211,9 +224,11 @@ HESealEncryptionParameters::parse_config_or_use_default(const char* config) {
       complex_packing = js["complex_packing"];
     }
 
+    std::size_t port = js["port"];
+
     auto params = HESealEncryptionParameters(scheme_name, poly_modulus_degree,
                                              coeff_mod_bits, security_level,
-                                             scale, complex_packing);
+                                             scale, complex_packing, port);
 
     return params;
   } catch (const std::exception& e) {
@@ -252,6 +267,9 @@ void print_encryption_parameters(const HESealEncryptionParameters& params,
   }
 
   param_ss << "|   security_level: " << params.security_level() << "\n"
+           << "\\";
+
+  param_ss << "|   port: " << params.port() << "\n"
            << "\\";
 
   NGRAPH_HE_LOG(1) << param_ss.str();
