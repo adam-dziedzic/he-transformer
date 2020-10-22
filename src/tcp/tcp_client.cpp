@@ -46,7 +46,13 @@ TCPClient::TCPClient(
 void TCPClient::close() {
   NGRAPH_HE_LOG(1) << "Closing socket";
   m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-  boost::asio::post(m_io_context, [this]() { m_socket.close(); });
+  boost::asio::post(m_io_context, [this]() { 
+    boost::system::error_code ec;
+    m_socket.close(ec); 
+    if (ec) {
+      NGRAPH_HE_LOG(0) << "Erorr while closing socket" << ec.message();
+    }
+    });
 }
 
 /// \brief Asynchronously writes the message
