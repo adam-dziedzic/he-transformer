@@ -121,19 +121,19 @@ def main(FLAGS):
     cryptonets_relu_model.fit(
         x_train,
         y_train,
-        epochs=FLAGS.epochs,
+        epochs=1,
         validation_data=(x_test, y_test),
         batch_size=FLAGS.batch_size)
 
     test_loss, test_acc = cryptonets_relu_model.evaluate(
         x_test, y_test, verbose=2)
     print("Test accuracy:", test_acc)
-
+    mnist_util.print_nodes()
     # Squash weights and save model
     weights = squash_layers(cryptonets_relu_model,
                             tf.compat.v1.keras.backend.get_session())
     (conv1_weights, squashed_weights, fc1_weights, fc2_weights) = weights[0:4]
-
+    mnist_util.print_nodes()
     tf.reset_default_graph()
     sess = tf.compat.v1.Session()
 
@@ -146,12 +146,13 @@ def main(FLAGS):
     y = model.cryptonets_relu_model_squashed(x, conv1_weights, squashed_weights,
                                              fc2_weights)
     sess.run(tf.compat.v1.global_variables_initializer())
-    mnist_util.save_model(
-        sess,
-        ["output/BiasAdd"],
-        "./models",
-        "cryptonets-relu",
-    )
+    mnist_util.print_nodes()
+    #mnist_util.save_model(
+    #    sess,
+    #    ["output/BiasAdd"],
+    #    "./models",
+    #    "cryptonets-relu",
+    #)
 
 
 if __name__ == "__main__":
