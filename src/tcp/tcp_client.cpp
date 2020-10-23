@@ -50,7 +50,7 @@ void TCPClient::close() {
     boost::system::error_code ec;
     m_socket.close(ec); 
     if (ec) {
-      NGRAPH_HE_LOG(0) << "Erorr while closing socket" << ec.message();
+      NGRAPH_HE_LOG(0) << "Erorr while closing socket: " << ec.message();
     }
     });
 }
